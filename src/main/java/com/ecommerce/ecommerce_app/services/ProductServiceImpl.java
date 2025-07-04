@@ -1,17 +1,21 @@
 package com.ecommerce.ecommerce_app.services;
 
+import com.ecommerce.ecommerce_app.controllers.ResourceNotFoundException;
 import com.ecommerce.ecommerce_app.dtos.ProductDTO;
 import com.ecommerce.ecommerce_app.entities.Product;
 import com.ecommerce.ecommerce_app.mappers.ProductMapper;
 import com.ecommerce.ecommerce_app.repositories.ProductRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.context.config.ConfigDataResourceNotFoundException;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
-
+// logging purposes
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ProductServiceImpl implements ProductService {
@@ -33,10 +37,10 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductDTO getById(Long id) {
-        Product p = productRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
-        return  mapper.toDTO(p);
+    public Optional<ProductDTO> getById(Long id) {
+
+        return  productRepository.findById(id)
+                .map(mapper::toDTO);
     }
 
     @Override
@@ -47,7 +51,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductDTO update(Long id, ProductDTO dto) {
+    public void update(Long id, ProductDTO dto) {
 
         Product existing = productRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
@@ -61,14 +65,18 @@ public class ProductServiceImpl implements ProductService {
 
 
         Product updated = productRepository.save(existing);
-        return mapper.toDTO(updated);
+        log.debug("Updated product with ID  {}" ,id);
 
 
     }
 
     @Override
     public void delete(Long id) {
+
         productRepository.deleteById(id);
+        log.debug("Deleted product with ID {}", id);
 
     }
+
+    // Patch request later !!
 }
