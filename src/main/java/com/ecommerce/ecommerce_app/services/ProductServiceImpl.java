@@ -54,29 +54,25 @@ public class ProductServiceImpl implements ProductService {
     public void update(Long id, ProductDTO dto) {
 
         Product existing = productRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
-
-        // copy fields --> update requests: all parts must be provided
-        // patch --> partial update
-        existing.setName(dto.getName());
-        existing.setDescription(dto.getDescription());
-        existing.setPrice(dto.getPrice());
-        existing.setStockQuantity(dto.getStockQuantity());
-
-
-        Product updated = productRepository.save(existing);
-        log.debug("Updated product with ID  {}" ,id);
-
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found" + id));
+        mapper.updateFromDto(dto, existing);
+        productRepository.save(existing);
+        log.debug("Updated product with Id {}", id);
 
     }
 
     @Override
     public void delete(Long id) {
 
+        if(!productRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Product not found with id " + id);
+        }
+
+
         productRepository.deleteById(id);
         log.debug("Deleted product with ID {}", id);
 
     }
 
-    // Patch request later !!
+    // No need for patch -- update logic is moved to mapper
 }
