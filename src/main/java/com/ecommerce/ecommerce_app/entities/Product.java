@@ -14,6 +14,7 @@ import java.math.BigDecimal;
 // Keep your JPA entities “pure” of HTTP-layer constraints
 // no bean validation here
 
+@Table(name = "products")
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
