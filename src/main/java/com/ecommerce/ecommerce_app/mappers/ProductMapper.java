@@ -7,12 +7,15 @@ import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 
+import java.util.List;
+
 @Mapper(componentModel = "spring")
 public interface ProductMapper {
 
     Product toEntity(ProductDTO dto);
     ProductDTO toDTO(Product product);
 
+    List<ProductDTO> toDtoList(List<Product> products);
 
 
     // every time you need a partial update you get the same behavior.
