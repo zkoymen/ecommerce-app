@@ -3,6 +3,7 @@ package com.ecommerce.ecommerce_app.controllers;
 
 import com.ecommerce.ecommerce_app.dtos.ProductDTO;
 import com.ecommerce.ecommerce_app.services.ProductService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -10,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.util.List;
 
 @Slf4j
@@ -19,8 +21,8 @@ import java.util.List;
 public class ProductController {
 
     // Define paths as constant --> good practice
-    public static final String PRODUCT_PATH = "/api/products";
-    public static final String ID_PATH = "/{id}";
+    public static final String PRODUCT_PATH = "/api/products/";
+    public static final String ID_PATH = "{id}";
 
     // Create a service instance
     // Required Argument constructor
@@ -28,24 +30,20 @@ public class ProductController {
 
 
 
-
-
-
     // RequestBody   --> as JSON
     // @PathVariable --> url
 
 
-
     // CREATE A NEW PRODUCT
     @PostMapping
-    public ResponseEntity create(@RequestBody ProductDTO dto) {
+    public ResponseEntity<ProductDTO> create(@Valid @RequestBody ProductDTO dto) {
 
         ProductDTO savedProduct = productService.create(dto);
 
         HttpHeaders headers = new HttpHeaders();
-        headers.add("Location", PRODUCT_PATH + savedProduct.getId().toString());
+        headers.setLocation(URI.create(PRODUCT_PATH + savedProduct.getId()));
 
-        return new ResponseEntity(headers, HttpStatus.CREATED);
+        return new ResponseEntity<>(savedProduct, headers, HttpStatus.CREATED);
 
     }
 
@@ -63,7 +61,7 @@ public class ProductController {
     }
 
     @PutMapping(ID_PATH)
-    public ResponseEntity<ProductDTO> update(@PathVariable("id") Long id, @RequestBody ProductDTO dto) {
+    public ResponseEntity update(@PathVariable("id") Long id, @Valid @RequestBody ProductDTO dto) {
 
         // Call the service first!
         productService.update(id, dto);
